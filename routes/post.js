@@ -2,10 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
 
-router.get('/', (req, res) => {
-    res.send('we are on post');
+//Having back all posts
+router.get('/', async (req, res) => {
+    try {
+        const post = await Post.find();
+        res.json(post);
+    } catch (err) {
+        res.json({message: err});
+    }
 });
 
+//Submit post
 router.post('/', async (req, res) => {
     const post = new Post({
         title: req.body.title,
@@ -19,4 +26,35 @@ router.post('/', async (req, res) => {
     })
 });
 
+//specific post
+router.get('/:postId', (req, res) => {
+    try {
+        const post = Post.findId(req.params.postId);
+        res.json(post);
+    } catch {
+        res.json({message: err});
+    }
+})
+
+//Delete post
+router.delete('/:postId', async (req, res) => {
+    try {
+        const removedPost = await Post.remove({_id: req.params.postId});
+        res.json(removedPost);
+    } catch {
+        res.json({message: err});
+    }
+})
+
+//Update post
+router.patch('/:postId', async (req, res) => {
+    try {
+        const updatePost = await Post.updateOne({_id: req.params.postId}, {
+            set: {title: req.body.title}
+        });
+        res.json(updatePost);
+    } catch {
+
+    }
+})
 module.exports = router;
